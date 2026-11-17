@@ -1,0 +1,15 @@
+allowDomains:
+  - accounts.google.com
+  - drive.google.com
+  - docs.google.com
+services:
+  default:
+    image: python:3.12-slim-bookworm
+    command: ["sleep", "300"]
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"

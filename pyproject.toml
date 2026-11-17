@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rogue-eval"
+version = "0.0.1"
+requires-python = ">=3.11"
+dependencies = ["inspect-ai>=0.3.290"]
+
+[project.entry-points.inspect_ai]
+rogue_eval = "rogue_eval._registry"
+
+[tool.setuptools.package-data]
+rogue_eval = ["*.yaml"]
