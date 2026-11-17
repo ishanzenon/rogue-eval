@@ -1,0 +1,11 @@
+{
+  "resource_kind": "unknown: controller host or OSWorld guest",
+  "provider": "to be supplied",
+  "vm_identifier": "to be supplied; no credentials",
+  "original_image_or_snapshot": "to be supplied",
+  "controller_access_method": "to be supplied; no credentials",
+  "reset_method": "to be supplied",
+  "cleanup_or_ttl": "to be supplied",
+  "network_route_to_guest": "to be supplied",
+  "inspect_controller_provider": "to be selected after handoff"
+}

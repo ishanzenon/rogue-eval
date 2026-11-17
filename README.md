@@ -1,6 +1,10 @@
 # rogue-eval
 ROGUE benchmark audit and Inspect/Hawk evaluation setup
 
+Start with [Day 1 setup and the first real episode](DAY1.md). The original
+82-task map and native episode adapter are under `src/rogue_eval/`.
+Infrastructure probes remain under `probes/`; they are not ROGUE results.
+
 ## Hawk access
 
 This project uses Generality Labs' existing Hawk deployment. The API reported
