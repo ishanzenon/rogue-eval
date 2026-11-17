@@ -1,6 +1,6 @@
 name: rogue-prerequisite-probe
 tasks:
-  - package: git+https://github.com/ishanzenon/rogue-eval@89dc16b
+  - package: git+https://github.com/ishanzenon/rogue-eval@eb3fa5167ec35b916dc475baeef4a442acc93823
     name: rogue_eval
     items:
       - name: infrastructure_probe
@@ -17,7 +17,6 @@ retry_attempts: 0
 max_retries: 0
 time_limit: 45
 token_limit: 1
-cost_limit: 0.01
 runner:
   cpu: "500m"
   memory: "1Gi"
