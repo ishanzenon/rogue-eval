@@ -8,3 +8,6 @@ logs/
 artifacts/
 *.eval
 credentials/
+dist/
+build/
+*.egg-info/

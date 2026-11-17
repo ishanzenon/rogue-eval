@@ -11,5 +11,8 @@ dependencies = ["inspect-ai>=0.3.280"]
 [project.entry-points.inspect_ai]
 rogue_eval = "rogue_eval._registry"
 
+[tool.setuptools]
+packages = ["rogue_eval"]
+
 [tool.setuptools.package-data]
 rogue_eval = ["*.yaml"]

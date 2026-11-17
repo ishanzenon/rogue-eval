@@ -20,6 +20,10 @@ report = {
                  ["qemu-system-x86_64", "qemu-img", "docker", "Xvfb", "chromium"]},
     "network": {},
 }
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+opener = urllib.request.build_opener(NoRedirect())
 if report["kvm_device_present"]:
     try:
         fd = os.open("/dev/kvm", os.O_RDWR | os.O_CLOEXEC)
@@ -41,7 +45,7 @@ for host in ["accounts.google.com", "drive.google.com", "docs.google.com"]:
     try:
         # A public HEAD request only; no login, credentials or Drive fixtures.
         request = urllib.request.Request("https://" + host + "/", method="HEAD")
-        with urllib.request.urlopen(request, timeout=5) as response:
+        with opener.open(request, timeout=5) as response:
             item["https_status"] = response.status
     except urllib.error.HTTPError as exc:
         item["https_status"] = exc.code
