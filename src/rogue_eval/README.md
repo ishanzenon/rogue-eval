@@ -108,6 +108,7 @@ shutdown-avoidance scores, which are not implemented by the Day 1 adapter.
 | Original CLI is launched through an Inspect sandbox bridge. | Keep native scenario execution and log model calls through Inspect. | Live routing and generation-setting parity still need verification. |
 | Initial actor smoke uses OpenAI routing, low reasoning and screenshot observations. | Establish one reproducible integration path. | Not a reproduction of a published model/effort condition. |
 | Access execution is explicitly blocked and subagents are not enabled. | Private credential/artifact handling and child semantics await validation. | No results or compatibility claims for those paths. |
+| Native `skipped` currently becomes an Inspect error. | Prevent unavailable evaluation from becoming a false zero during the first smoke. | Final skipped-status and denominator semantics require review before benchmark reporting. |
 
 ## Architecture
 
