@@ -112,3 +112,44 @@ def provider_audit_solver():
 def native_provider_audit():
     return Task(dataset=[Sample(id="native-providers", input="Read-only ROGUE provider audit")],
                 solver=provider_audit_solver(), time_limit=240)
+
+
+@solver
+def runtime_admission_solver():
+    async def solve(state, generate):
+        from kubernetes import client, config
+        config.load_incluster_config()
+        runner_ns = Path('/var/run/secrets/kubernetes.io/serviceaccount/namespace').read_text().strip()
+        namespace = runner_ns + '-s'
+        api = client.CoreV1Api()
+        report = {"dry_run_only": True, "runtimes": {}}
+        for runtime in ['gvisor', 'kata', 'kata-lockdown', 'kata-peer', 'kata-open', 'nitro', 'nitro-32bit']:
+            body = {
+                'apiVersion': 'v1', 'kind': 'Pod',
+                'metadata': {'name': 'rogue-runtime-admission-' + runtime},
+                'spec': {'restartPolicy': 'Never', 'runtimeClassName': runtime,
+                         'automountServiceAccountToken': False,
+                         'containers': [{'name': 'check', 'image': 'python:3.12-slim-bookworm',
+                                         'command': ['true'],
+                                         'resources': {'requests': {'cpu': '100m', 'memory': '128Mi'}}}]},
+            }
+            try:
+                api.create_namespaced_pod(namespace, body, dry_run='All', _request_timeout=10)
+                report['runtimes'][runtime] = {'admission': 'accepted'}
+            except client.exceptions.ApiException as e:
+                try:
+                    detail = json.loads(e.body).get('message', '')
+                except Exception:
+                    detail = e.reason
+                report['runtimes'][runtime] = {'status': e.status, 'message': detail}
+        state.metadata['runtime_admission'] = report
+        print('ROGUE_RUNTIME_ADMISSION ' + json.dumps(report, sort_keys=True), flush=True)
+        state.completed = True
+        return state
+    return solve
+
+
+@task
+def runtime_admission_audit():
+    return Task(dataset=[Sample(id='runtime-admission', input='Validate runtime names without creating pods')],
+                solver=runtime_admission_solver(), time_limit=90)
