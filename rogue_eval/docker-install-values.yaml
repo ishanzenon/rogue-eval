@@ -1,0 +1,14 @@
+allowDomains:
+  - deb.debian.org
+  - security.debian.org
+services:
+  default:
+    image: python:3.12-slim-bookworm
+    command: ["sleep", "900"]
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "1"
+        memory: "1536Mi"
