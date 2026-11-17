@@ -1,0 +1,17 @@
+{
+  "rogue-runtime-admission-bydvdpuna9ivcztd": {
+    "remaining_pods": 0
+  },
+  "rogue-native-provider-aud-g8puk6eghvxqenbr": {
+    "remaining_pods": 0
+  },
+  "rogue-runtime-gvisor-hujagbmo4pbhjykp": {
+    "remaining_pods": 0
+  },
+  "rogue-runtime-kata-4lqgc7hvzavx5x1a": {
+    "remaining_pods": 0
+  },
+  "rogue-runtime-nitro-kyjwgjwdhhsk592u": {
+    "remaining_pods": 0
+  }
+}

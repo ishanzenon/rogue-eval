@@ -11,3 +11,7 @@ credentials/
 dist/
 build/
 *.egg-info/
+**/settings/google/settings.json
+**/settings/googledrive/client_secrets.json
+**/settings/googledrive/credentials.json
+client_secret_*.json

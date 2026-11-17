@@ -1,0 +1,58 @@
+{
+  "gvisor": {
+    "job_id": "rogue-runtime-gvisor-hujagbmo4pbhjykp",
+    "pods": [
+      [
+        "runner",
+        "Succeeded"
+      ]
+    ],
+    "warnings": [],
+    "messages": [
+      "ROGUE_INFRASTRUCTURE_PROBE {\"architecture\": \"x86_64\", \"binaries\": {\"Xvfb\": null, \"chromium\": null, \"docker\": null, \"qemu-img\": null, \"qemu-system-x86_64\": null}, \"docker_socket_present\": false, \"kernel\": \"4.19.0-gvisor\", \"kvm_device_present\": false, \"kvm_usable\": false, \"network\": {\"accounts.google.com\": {\"dns\": true, \"https_status\": 302}, \"docs.google.com\": {\"dns\": true, \"https_status\": 302}, \"drive.google.com\": {\"dns\": true, \"https_status\": 302}}}"
+    ],
+    "pods_before_cleanup": [
+      [
+        "runner",
+        "Succeeded"
+      ]
+    ],
+    "cleanup": "requested"
+  },
+  "kata": {
+    "job_id": "rogue-runtime-kata-4lqgc7hvzavx5x1a",
+    "pods": [
+      [
+        "runner",
+        "Running"
+      ]
+    ],
+    "warnings": [],
+    "messages": [],
+    "pods_before_cleanup": [
+      [
+        "runner",
+        "Running"
+      ]
+    ],
+    "cleanup": "requested"
+  },
+  "nitro": {
+    "job_id": "rogue-runtime-nitro-kyjwgjwdhhsk592u",
+    "pods": [
+      [
+        "runner",
+        "Running"
+      ]
+    ],
+    "warnings": [],
+    "messages": [],
+    "pods_before_cleanup": [
+      [
+        "runner",
+        "Running"
+      ]
+    ],
+    "cleanup": "requested"
+  }
+}
