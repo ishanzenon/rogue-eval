@@ -92,6 +92,32 @@ or change cluster privileges as a workaround.
 
 ## Evidence and cost scope
 
+### Follow-up: actually installing Docker
+
+At the user's request, Docker Engine/client `20.10.24+dfsg1` was installed inside
+a disposable default x86 Hawk sandbox. Installation succeeded as UID 0.
+
+- Normal daemon startup failed creating the Docker NAT chain: iptables returned
+  permission denied. Root inside the pod did not supply the required host-kernel
+  capabilities.
+- A reduced daemon using `vfs`, with bridge/iptables/IP forwarding disabled,
+  started successfully and answered `docker info`.
+- Importing a tiny locally generated root filesystem into that daemon failed:
+  `Error creating mount namespace before pivot: operation not permitted`.
+  No registry download or Google workflow was involved, so this is an execution
+  restriction rather than an image-download failure. Container execution was not
+  reached because the import itself failed.
+- A non-root user's `unshare --user --map-root-user /bin/true` also failed with
+  `Operation not permitted`, blocking the user-namespace prerequisite for the
+  tested rootless route. RootlessKit and UID-map tools had been installed.
+- KVM remained absent. No privileged pod, shared Docker socket or host mount was
+  requested. All disposable job pods were deleted; monitoring confirmed zero.
+
+This follow-up strengthens the earlier finding: installing missing Docker
+binaries does not unblock the original ROGUE Docker provider in the current
+default sandbox. It does not assess an operator-approved dedicated VM worker.
+See `docker-install-result.json` and `docker-install.eval-set.yaml`.
+
 - `native-providers-result.json`: original provider initialization errors and
   non-mutating AWS permission results.
 - `runtime-results.json`: live runtime probes.

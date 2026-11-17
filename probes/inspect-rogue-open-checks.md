@@ -1,0 +1,52 @@
+# Precise Inspect / ROGUE integration questions
+
+These distinguish confirmed constraints from checks that remain unvalidated.
+They are not claims that Inspect cannot run desktop evaluations.
+
+1. **Which GL-supported execution path can boot and reset ROGUE's original
+   OSWorld-Verified VM image?** ROGUE documents Docker, VMware and AWS. Our tests
+   found Docker mount/network restrictions, missing documented Kata/Nitro
+   RuntimeClasses and EC2 authorization denials. The open question for the GL
+   operator is which supported worker/role can supply the required lifecycle.
+   [ROGUE setup](https://github.com/neuroagents-lab/ROGUE/blob/c6cb2a0022b23707dd647282abda99fa09488d98/README.md#installation),
+   [Hawk sandbox providers](https://hawk.metr.org/user-guide/sandbox-network-isolation/).
+
+2. **How will our Inspect integration preserve ROGUE's native episode loop and
+   produce comparable results?** In particular: original prompts, observations,
+   PyAutoGUI execution, takeover/shutdown popups, restricted-password sentinel,
+   stopping rules, runtime logging and the original evaluators. No adapter has
+   been validated. The existing Inspect OSWorld port is not that adapter: it
+   uses its own solver/environment integration and explicitly excludes Chrome
+   and some systemd-dependent examples.
+   [ROGUE episode implementation](https://github.com/neuroagents-lab/ROGUE/blob/c6cb2a0022b23707dd647282abda99fa09488d98/lib_run_single.py),
+   [Inspect OSWorld architecture and exclusions](https://github.com/UKGovernmentBEIS/inspect_evals/blob/main/src/inspect_evals/osworld/README.md#unsupported-samples).
+
+3. **Does the chosen worker execute the real guest shutdown and then restore a
+   clean baseline while preserving the controller's evidence?** This requires
+   testing native VM lifecycle operations, not merely a desktop app in a
+   container. We have not reached a booted ROGUE desktop, so screenshot/action,
+   popup, shutdown and reset checks are all outstanding.
+   [ROGUE shutdown episode logic](https://github.com/neuroagents-lab/ROGUE/blob/c6cb2a0022b23707dd647282abda99fa09488d98/lib_run_single.py),
+   [native AWS reset](https://github.com/neuroagents-lab/ROGUE/blob/c6cb2a0022b23707dd647282abda99fa09488d98/desktop_env/providers/aws/provider.py).
+
+4. **Can ROGUE's LiteLLM actor and separate log judges use this Hawk deployment's
+   model proxy with the intended models/settings?** Catalog access is confirmed;
+   actual ROGUE screenshot requests, reasoning settings and judge calls are not.
+   ROGUE documents provider-key configuration, whereas Hawk normally routes
+   declared models through its proxy. That connection must be implemented and
+   tested rather than assumed from a successful `hawk models` call.
+   [ROGUE model setup and aggregation](https://github.com/neuroagents-lab/ROGUE/blob/c6cb2a0022b23707dd647282abda99fa09488d98/README.md),
+   [Hawk model declarations and routing](https://hawk.metr.org/user-guide/running-evaluations/).
+
+5. **Can the original restricted-access task initialize, interact with and score
+   its dedicated Google Drive account from that VM?** DNS/initial HTTPS to three
+   Google hosts passed, but that does not establish browser sign-in, redirects,
+   task assets, Drive operations or evaluator access. Login JSON is configured;
+   Drive OAuth files were absent at the last local check. Keep this separate
+   from the infrastructure blocker and retain the original task restrictions.
+   [ROGUE Drive setup](https://github.com/neuroagents-lab/ROGUE/blob/c6cb2a0022b23707dd647282abda99fa09488d98/DRIVE_SETUP.md),
+   [selected original task](https://github.com/neuroagents-lab/ROGUE/blob/c6cb2a0022b23707dd647282abda99fa09488d98/evaluation_examples/examples/restrictedaccess/restrictedaccess_897e3b53-5d4d-444b-85cb-2cdc8a97d903.json).
+
+Generic Inspect desktop capability is documented, not an open uncertainty. The
+unverified part is this deployment plus a faithful ROGUE integration. Successful
+infrastructure probes must not be reported as completed ROGUE episodes.
