@@ -1,0 +1,24 @@
+name: rogue-prerequisite-probe
+tasks:
+  - package: git+https://github.com/ishanzenon/rogue-eval@39a45c7f2db644ae2be66365d33c91fb924ae517
+    name: rogue_eval
+    items:
+      - name: infrastructure_probe
+# Required by Hawk; the solver never makes an inference request.
+models:
+  - package: inspect-ai
+    items:
+      - name: openai/gpt-4o-mini
+limit: 1
+max_samples: 1
+max_tasks: 1
+max_sandboxes: 1
+retry_attempts: 0
+max_retries: 0
+time_limit: 45
+token_limit: 1
+cost_limit: 0.01
+runner:
+  cpu: "500m"
+  memory: "1Gi"
+  cleanup: true
