@@ -7,8 +7,7 @@ from inspect_ai.dataset import Sample
 from inspect_ai.solver import solver
 from inspect_ai.util import sandbox
 
-
-PROBE = r'''
+PROBE = r"""
 import fcntl, json, os, platform, shutil, socket, urllib.request, urllib.error
 report = {
     "architecture": platform.machine(),
@@ -53,7 +52,7 @@ for host in ["accounts.google.com", "drive.google.com", "docs.google.com"]:
         item["https_error"] = str(exc)
     report["network"][host] = item
 print(json.dumps(report, sort_keys=True))
-'''
+"""
 
 
 @solver
@@ -70,6 +69,7 @@ def probe_solver():
             raise RuntimeError("Infrastructure probe failed: " + result.stderr)
         state.completed = True
         return state
+
     return solve
 
 

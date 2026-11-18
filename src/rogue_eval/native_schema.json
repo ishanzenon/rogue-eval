@@ -1,0 +1,380 @@
+{
+  "--path_to_vm": {
+    "dest": "path_to_vm",
+    "flags": [
+      "--path_to_vm"
+    ],
+    "default": null,
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--provider_name": {
+    "dest": "provider_name",
+    "flags": [
+      "--provider_name"
+    ],
+    "default": "vmware",
+    "choices": [
+      "vmware",
+      "docker",
+      "aws",
+      "azure",
+      "gcp",
+      "virtualbox",
+      "aliyun",
+      "volcengine"
+    ],
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--headless": {
+    "dest": "headless",
+    "flags": [
+      "--headless"
+    ],
+    "default": false,
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": true
+  },
+  "--action_space": {
+    "dest": "action_space",
+    "flags": [
+      "--action_space"
+    ],
+    "default": "pyautogui",
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--observation_type": {
+    "dest": "observation_type",
+    "flags": [
+      "--observation_type"
+    ],
+    "default": "a11y_tree",
+    "choices": [
+      "screenshot",
+      "a11y_tree",
+      "screenshot_a11y_tree",
+      "som"
+    ],
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--screen_width": {
+    "dest": "screen_width",
+    "flags": [
+      "--screen_width"
+    ],
+    "default": 1920,
+    "choices": null,
+    "type": "int",
+    "nargs": null,
+    "const": null
+  },
+  "--screen_height": {
+    "dest": "screen_height",
+    "flags": [
+      "--screen_height"
+    ],
+    "default": 1080,
+    "choices": null,
+    "type": "int",
+    "nargs": null,
+    "const": null
+  },
+  "--sleep_after_execution": {
+    "dest": "sleep_after_execution",
+    "flags": [
+      "--sleep_after_execution"
+    ],
+    "default": 0.0,
+    "choices": null,
+    "type": "float",
+    "nargs": null,
+    "const": null
+  },
+  "--max_steps": {
+    "dest": "max_steps",
+    "flags": [
+      "--max_steps"
+    ],
+    "default": 15,
+    "choices": null,
+    "type": "int",
+    "nargs": null,
+    "const": null
+  },
+  "--show_steps_left_in_prompt": {
+    "dest": "show_steps_left_in_prompt",
+    "flags": [
+      "--show_steps_left_in_prompt"
+    ],
+    "default": false,
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": true
+  },
+  "--full-recording": {
+    "dest": "recording_mode",
+    "flags": [
+      "--full-recording"
+    ],
+    "default": "full",
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": "full"
+  },
+  "--per-step-recording": {
+    "dest": "recording_mode",
+    "flags": [
+      "--per-step-recording"
+    ],
+    "default": "full",
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": "per-step"
+  },
+  "--quicktime-compatible-recording": {
+    "dest": "recording_mode",
+    "flags": [
+      "--quicktime-compatible-recording",
+      "--quicktime_compatible_recording"
+    ],
+    "default": "full",
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": "full"
+  },
+  "--enable_proxy": {
+    "dest": "enable_proxy",
+    "flags": [
+      "--enable_proxy"
+    ],
+    "default": false,
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": true
+  },
+  "--max_trajectory_length": {
+    "dest": "max_trajectory_length",
+    "flags": [
+      "--max_trajectory_length"
+    ],
+    "default": 25,
+    "choices": null,
+    "type": "int",
+    "nargs": null,
+    "const": null
+  },
+  "--environment-question": {
+    "dest": "environment_question",
+    "flags": [
+      "--environment-question"
+    ],
+    "default": false,
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": true
+  },
+  "--deployment-prompt": {
+    "dest": "deployment_prompt",
+    "flags": [
+      "--deployment-prompt"
+    ],
+    "default": false,
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": true
+  },
+  "--evaluation-prompt": {
+    "dest": "evaluation_prompt",
+    "flags": [
+      "--evaluation-prompt"
+    ],
+    "default": false,
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": true
+  },
+  "--inoculation-prompt": {
+    "dest": "inoculation_prompt",
+    "flags": [
+      "--inoculation-prompt"
+    ],
+    "default": false,
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": true
+  },
+  "--enable_subagents": {
+    "dest": "enable_subagents",
+    "flags": [
+      "--enable_subagents"
+    ],
+    "default": false,
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": true
+  },
+  "--subagent_inherit_parent_history": {
+    "dest": "subagent_inherit_parent_history",
+    "flags": [
+      "--subagent_inherit_parent_history"
+    ],
+    "default": false,
+    "choices": null,
+    "type": "bool",
+    "nargs": 0,
+    "const": true
+  },
+  "--test_config_base_dir": {
+    "dest": "test_config_base_dir",
+    "flags": [
+      "--test_config_base_dir"
+    ],
+    "default": "evaluation_examples",
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--model": {
+    "dest": "model",
+    "flags": [
+      "--model"
+    ],
+    "default": "gpt-5.4",
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--temperature": {
+    "dest": "temperature",
+    "flags": [
+      "--temperature"
+    ],
+    "default": 1.0,
+    "choices": null,
+    "type": "float",
+    "nargs": null,
+    "const": null
+  },
+  "--top_p": {
+    "dest": "top_p",
+    "flags": [
+      "--top_p"
+    ],
+    "default": 0.9,
+    "choices": null,
+    "type": "float",
+    "nargs": null,
+    "const": null
+  },
+  "--max_tokens": {
+    "dest": "max_tokens",
+    "flags": [
+      "--max_tokens"
+    ],
+    "default": 1500,
+    "choices": null,
+    "type": "int",
+    "nargs": null,
+    "const": null
+  },
+  "--reasoning_effort": {
+    "dest": "reasoning_effort",
+    "flags": [
+      "--reasoning_effort"
+    ],
+    "default": "low",
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--stop_token": {
+    "dest": "stop_token",
+    "flags": [
+      "--stop_token"
+    ],
+    "default": null,
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--domain": {
+    "dest": "domain",
+    "flags": [
+      "--domain"
+    ],
+    "default": "all",
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--test_all_meta_path": {
+    "dest": "test_all_meta_path",
+    "flags": [
+      "--test_all_meta_path"
+    ],
+    "default": "evaluation_examples/test_all.json",
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--result_dir": {
+    "dest": "result_dir",
+    "flags": [
+      "--result_dir"
+    ],
+    "default": "./results",
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--region": {
+    "dest": "region",
+    "flags": [
+      "--region"
+    ],
+    "default": "us-east-1",
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  },
+  "--client_password": {
+    "dest": "client_password",
+    "flags": [
+      "--client_password"
+    ],
+    "default": "",
+    "choices": null,
+    "type": "str",
+    "nargs": null,
+    "const": null
+  }
+}
