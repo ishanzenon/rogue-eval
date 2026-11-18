@@ -2,6 +2,8 @@
 
 This is the historical Day 1 setup snapshot. See [Days 2 and 3](DAY2_DAY3.md) for the expanded scorers, variants, settings and current deviations. In particular, native skipped results now become unscored under eval version 2-A. The real VM acceptance items below remain incomplete.
 
+For the London deployment, send the [AWS handoff](AWS_HANDOFF.md) to the operator. It lists the image, lifecycle permissions, network settings and acceptance evidence we need back in one reply.
+
 Checkpoint: one original human-control episode executes through Inspect, with native task scoring, model-call logs, retained desktop evidence and verified VM cleanup. This combines the plan's initial setup with its first-episode goal; it does not change the cohort calendar or mark later scorer work complete.
 
 ## Checklist
