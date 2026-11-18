@@ -44,7 +44,7 @@ where = ["src"]
 include = ["rogue_eval*"] # examples/ stays out of the wheel
 
 [tool.setuptools.package-data]
-"*" = ["eval.yaml", "*.yaml", "*.json", "UPSTREAM-LICENSE"]
+"*" = ["eval.yaml", "*.yaml", "*.json", "variants/*.json", "UPSTREAM-LICENSE"]
 
 # Layout preset: multi-eval (tests/<package>/, src/<package>/README.md) or
 # single-eval (flat tests/, README at the root). A hybrid repo keeps a preset and
@@ -68,14 +68,14 @@ inspect_evals_dataset_download = true
 pythonVersion = "3.13"
 typeCheckingMode = "standard"
 reportMissingTypeStubs = false
-exclude = [".venv", "agent_artefacts", "build"]
+exclude = [".venv", "agent_artefacts", "build", "src/rogue_eval/_upstream.py"]
 
 [tool.ruff]
 line-length = 100
 src = ["src"]
 target-version = "py313"
 # *.md: ruff formats Python blocks in Markdown, and the README generator writes them its own way.
-extend-exclude = ["agent_artefacts", "probes", "*.md"]
+extend-exclude = ["agent_artefacts", "probes", "*.md", "src/rogue_eval/_upstream.py"]
 
 [tool.ruff.lint]
 preview = true
@@ -99,17 +99,17 @@ select = [
     "RUF",   # ruff-specific rules
     "PLE",   # pylint errors
     "PLW",   # pylint warnings
-    "PLW1514", # explicit text encoding, required by the eval checks
+    "unspecified-encoding", # explicit text encoding, required by the eval checks
 ]
 ignore = [
-    "E501",   # line-too-long: the formatter owns line length
+    "line-too-long",   # line-too-long: the formatter owns line length
     "D10",    # missing docstrings
-    "D415",   # first-line punctuation
-    "ISC001", # single-line implicit concat conflicts with the formatter
+    "missing-terminal-punctuation",   # first-line punctuation
+    "single-line-implicit-string-concatenation", # single-line implicit concat conflicts with the formatter
 ]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"**/{tests,examples}/**" = ["D", "PLR2004", "RUF029"] # async mocks implement async protocols
+"**/{tests,examples}/**" = ["D", "magic-value-comparison", "unused-async"] # async mocks implement async protocols

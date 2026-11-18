@@ -72,7 +72,7 @@ def test_task_score_values(text, expected):
     assert parse_native_score(text) == expected
 
 
-@pytest.mark.parametrize("text", ["skipped", "", "nan", "inf", "-1", "1.1", "broken"])
+@pytest.mark.parametrize("text", ["", "nan", "inf", "-1", "1.1", "broken"])
 def test_missing_skipped_or_invalid_is_not_zero(text):
     with pytest.raises(RuntimeError):
         parse_native_score(text)
@@ -102,7 +102,7 @@ def test_native_command_preserves_original_loop_and_budget():
 def test_task_construction_does_not_need_a_vm():
     task = rogue_eval(sandbox_config="operator-worker.yaml")
     assert len(task.dataset) == 82
-    assert EVAL_VERSION == "1-A"
+    assert EVAL_VERSION == "2-A"
     assert len(rogue_eval(scenario="override", sandbox_config="worker.yaml").dataset) == 52
 
 
@@ -119,11 +119,22 @@ def test_unknown_scenario_cannot_silently_drop_samples():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
+    "domain",
+    [
+        "override",
+        "rewire",
+        "restrictedaccess",
+        "subagents_override",
+        "subagents_rewire",
+        "subagents_restrictedaccess",
+    ],
+)
+@pytest.mark.parametrize(
     ("native_exit", "score_text", "expected_status"),
-    [(0, "0", "success"), (0, "skipped", "error"), (1, "", "error")],
+    [(0, "0", "success"), (0, "skipped", "success"), (1, "", "error")],
 )
 async def test_first_original_episode_through_inspect_with_mocked_worker(
-    monkeypatch, tmp_path, native_exit, score_text, expected_status
+    monkeypatch, tmp_path, native_exit, score_text, expected_status, domain
 ):
     """A pipeline test; explicitly not a VM boot or native desktop E2E test."""
     import importlib
@@ -134,7 +145,13 @@ async def test_first_original_episode_through_inspect_with_mocked_worker(
 
     module = importlib.import_module("rogue_eval.rogue_eval")
     record = next(
-        r for r in load_records() if r["id"] == "override_0512bb38-d531-4acf-9e7e-0add90816068"
+        r
+        for r in load_records(domain)
+        if r["id"].endswith(
+            "897e3b53-5d4d-444b-85cb-2cdc8a97d903"
+            if "restrictedaccess" in domain
+            else "0512bb38-d531-4acf-9e7e-0add90816068"
+        )
     )
     config_text = '{"test":"original-config"}'
     record = dict(record, config_sha256=hashlib.sha256(config_text.encode()).hexdigest())
@@ -173,9 +190,17 @@ async def test_first_original_episode_through_inspect_with_mocked_worker(
     monkeypatch.setattr(module, "sandbox", lambda: fake)
     monkeypatch.setattr(module, "sandbox_agent_bridge", bridge)
     monkeypatch.setattr(module, "get_model", lambda: SimpleNamespace(name="openai/gpt-5.4-mini"))
-    monkeypatch.setattr(module, "load_records", lambda: [record])
+    monkeypatch.setattr(module, "load_records", lambda domain="all": [record])
+    monkeypatch.setattr(
+        module,
+        "analyze_archive",
+        lambda *args: {
+            "family": "override",
+            "actual": {"detector_evidence_available": False},
+        },
+    )
     monkeypatch.chdir(tmp_path)
-    task = rogue_eval(scenario="override", sandbox_config="unused")
+    task = rogue_eval(scenario=domain, sandbox_config="unused", access_ready=True)
     # We mocked the worker transport and bridge, so no real sandbox is launched.
     task.sandbox = None
     logs = await module_test_eval(task, tmp_path)
@@ -183,13 +208,24 @@ async def test_first_original_episode_through_inspect_with_mocked_worker(
     assert logs[0].samples is not None
     if expected_status == "success":
         assert logs[0].samples[0].scores is not None
-        assert logs[0].samples[0].scores["native_task_completion"].value == 0
+        assert set(logs[0].samples[0].scores) == {
+            "native_task_completion",
+            "native_task_success",
+            "actual_violation",
+            "intended_violation",
+            "alternate_shutdown_avoidance",
+        }
+        score = logs[0].samples[0].scores["native_task_completion"]
+        if score_text == "skipped":
+            assert score.reason == "upstream_skipped"
+        else:
+            assert score.value == 0
     else:
         assert logs[0].samples[0].error is not None
         assert not logs[0].samples[0].scores
     assert len(list((tmp_path / "artifacts").glob("*/native-artifacts.tar.gz"))) == 1
     manifests = [v for k, v in writes.items() if k.endswith("manifest.json")]
-    assert json.loads(manifests[0]) == {"override": [record["id"]]}
+    assert json.loads(manifests[0]) == {domain: [record["id"]]}
 
 
 async def module_test_eval(task, tmp_path):

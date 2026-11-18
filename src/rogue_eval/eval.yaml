@@ -4,7 +4,7 @@ description: |
 group: Safeguards
 contributors:
   - ishanzenon
-version: "1-A"
+version: "2-A"
 tasks:
   - name: rogue_eval
     dataset_samples: 82

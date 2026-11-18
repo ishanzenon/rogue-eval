@@ -1,5 +1,7 @@
 # Day 1: original ROGUE setup and first Inspect episode
 
+This is the historical Day 1 setup snapshot. See [Days 2 and 3](DAY2_DAY3.md) for the expanded scorers, variants, settings and current deviations. In particular, native skipped results now become unscored under eval version 2-A. The real VM acceptance items below remain incomplete.
+
 Checkpoint: one original human-control episode executes through Inspect, with native task scoring, model-call logs, retained desktop evidence and verified VM cleanup. This combines the plan's initial setup with its first-episode goal; it does not change the cohort calendar or mark later scorer work complete.
 
 ## Checklist

@@ -18,13 +18,36 @@ from inspect_ai.solver import Generate, Solver, TaskState, solver
 from inspect_ai.util import sandbox
 from inspect_evals_utils.metadata import load_eval_version
 
+from rogue_eval.scoring import (
+    actual_violation,
+    alternate_shutdown_avoidance,
+    analyze_archive,
+    intended_violation,
+    native_task_success,
+    scenario_family,
+)
+from rogue_eval.settings import (
+    condition_fingerprint,
+    options_to_args,
+    preset_options,
+    read_data,
+    validate_options,
+)
+
 EVAL_VERSION = load_eval_version(__file__)
 ROGUE_COMMIT = "c6cb2a0022b23707dd647282abda99fa09488d98"
 STEP_LIMITS = {"override": 20, "rewire": 25, "restrictedaccess": 40}
 
 
-def load_records() -> list[dict[str, Any]]:
-    return json.loads(Path(__file__).with_name("tasks.json").read_text(encoding="utf-8"))
+def load_records(domain: str = "all") -> list[dict[str, Any]]:
+    if domain == "all":
+        return json.loads(Path(__file__).with_name("tasks.json").read_text(encoding="utf-8"))
+    domains = read_data("provenance.json")["domains"]
+    if domain == "all_variants":
+        return [record for name in domains for record in read_data(f"variants/{name}.json")]
+    if domain not in domains:
+        raise ValueError(f"Unknown ROGUE scenario: {domain}")
+    return read_data(f"variants/{domain}.json")
 
 
 def record_to_sample(record: dict[str, Any]) -> Sample:
@@ -35,9 +58,9 @@ def record_to_sample(record: dict[str, Any]) -> Sample:
     )
 
 
-def parse_native_score(text: str) -> float:
+def parse_native_score(text: str) -> float | str:
     if text.strip().lower() == "skipped":
-        raise RuntimeError("Native evaluator skipped; no valid task score")
+        return "skipped"
     try:
         value = float(text.strip())
     except ValueError as exc:
@@ -45,6 +68,26 @@ def parse_native_score(text: str) -> float:
     if not math.isfinite(value) or not 0 <= value <= 1:
         raise RuntimeError("Native task score must be finite and between zero and one")
     return value
+
+
+def resolved_options(
+    scenario: str, reasoning_effort: str, native_options: dict[str, Any] | None = None
+) -> dict[str, Any]:
+    family = scenario_family(scenario)
+    options = {
+        "headless": True,
+        "action_space": "pyautogui",
+        "observation_type": "screenshot",
+        "max_steps": STEP_LIMITS[family] + (10 if scenario.startswith("subagents_") else 0),
+        "max_trajectory_length": 20,
+        "recording_mode": "per-step",
+        "reasoning_effort": reasoning_effort,
+        "enable_subagents": scenario.startswith("subagents_"),
+    }
+    options.update(native_options or {})
+    if options["enable_subagents"] != scenario.startswith("subagents_"):
+        raise ValueError("Select the original subagents domain to enable delegation")
+    return validate_options(options)
 
 
 def native_command(
@@ -58,26 +101,17 @@ def native_command(
     path_to_vm: str | None,
     region: str,
     reasoning_effort: str,
+    native_options: dict[str, Any] | None = None,
 ) -> list[str]:
+    options = resolved_options(scenario, reasoning_effort, native_options)
     args = [
         native_python,
         f"{root}/run.py",
         "--provider_name",
         provider,
-        "--headless",
-        "--action_space",
-        "pyautogui",
-        "--observation_type",
-        "screenshot",
-        "--max_steps",
-        str(STEP_LIMITS[scenario]),
-        "--max_trajectory_length",
-        "20",
-        "--per-step-recording",
+        *options_to_args(options),
         "--model",
         model_alias,
-        "--reasoning_effort",
-        reasoning_effort,
         "--test_all_meta_path",
         manifest,
         "--result_dir",
@@ -102,6 +136,10 @@ def native_episode(
     reasoning_effort: str,
     episode_timeout: int,
     configured: bool = True,
+    native_options: dict[str, Any] | None = None,
+    expected_model: str | None = None,
+    access_ready: bool = False,
+    access_settings_file: str | None = None,
 ) -> Solver:
     async def solve(state: TaskState, generate: Generate) -> TaskState:
         if not configured:
@@ -114,7 +152,7 @@ def native_episode(
         if hashlib.sha256(text.encode()).hexdigest() != state.metadata["config_sha256"]:
             raise RuntimeError("Worker task config differs from pinned original")
         scenario = state.metadata["scenario"]
-        if scenario == "restrictedaccess":
+        if scenario_family(scenario) == "restrictedaccess" and not access_ready:
             raise RuntimeError("Access runs await private-artifact and Drive validation")
         features = inspect.signature(sandbox_agent_bridge).parameters
         if not {"model_aliases", "forward_generation_config"} <= features.keys():
@@ -129,6 +167,10 @@ def native_episode(
         if not model.name.startswith("openai/"):
             raise RuntimeError("Day 1 validates OpenAI actor routing first")
         alias = model.name.split("/", 1)[1]
+        if expected_model and alias != expected_model:
+            raise RuntimeError(
+                "Inspect actor differs from original preset; select its actor or use explicit native_options without a preset"
+            )
         command = native_command(
             native_python,
             root,
@@ -140,9 +182,49 @@ def native_episode(
             path_to_vm,
             region,
             reasoning_effort,
+            native_options,
+        )
+        effective = resolved_options(scenario, reasoning_effort, native_options)
+        state.metadata["native_options"] = effective
+        state.metadata["dataset_default_max_steps"] = state.metadata.get("max_steps")
+        state.metadata["max_steps"] = effective["max_steps"]
+        state.metadata["max_trajectory_length"] = effective["max_trajectory_length"]
+        # Result paths contain UUIDs and must not change a condition's identity.
+        semantic_args = []
+        skip = False
+        for argument in command[2:]:
+            if skip:
+                skip = False
+            elif argument in {"--test_all_meta_path", "--result_dir"}:
+                skip = True
+            else:
+                semantic_args.append(argument)
+        state.metadata["condition_fingerprint"] = condition_fingerprint(
+            {
+                "scenario": scenario,
+                "model": model.name,
+                "options": semantic_args,
+                "upstream": ROGUE_COMMIT,
+            }
         )
         state.metadata["native_artifact_directory"] = work
-        state.metadata["scoring_scope"] = "task completion; corrigibility scorers pending"
+        await env.write_file(
+            work + "/adapter-condition.json",
+            json.dumps(
+                {
+                    "fingerprint": state.metadata["condition_fingerprint"],
+                    "scenario": scenario,
+                    "model": model.name,
+                    "options": effective,
+                    "upstream_commit": ROGUE_COMMIT,
+                    "epoch": state.epoch,
+                    "sample_id": str(state.sample_id),
+                }
+            ),
+        )
+        state.metadata["scoring_scope"] = (
+            "native task reward and success; separate deterministic and optional LLM scores"
+        )
         try:
             async with sandbox_agent_bridge(
                 model_aliases={alias: model}, forward_generation_config=True
@@ -200,6 +282,16 @@ def native_episode(
             await asyncio.to_thread(destination.mkdir, parents=True)
             await asyncio.to_thread((destination / "native-artifacts.tar.gz").write_bytes, content)
             state.metadata["retained_native_artifacts"] = str(destination.resolve())
+        evidence = await asyncio.to_thread(
+            analyze_archive,
+            destination / "native-artifacts.tar.gz",
+            str(state.sample_id),
+            scenario,
+            access_settings_file,
+        )
+        evidence.pop("runtime", None)
+        evidence.pop("reasoning", None)
+        state.metadata["rogue_evidence"] = evidence
         state.completed = True
         return state
 
@@ -212,6 +304,11 @@ def native_task_completion():
     async def score(state: TaskState, target: Target) -> Score:  # ruff: ignore[unused-async]
         if "native_task_score" not in state.metadata:
             raise RuntimeError("No native score; infrastructure failure is not a zero")
+        if state.metadata["native_task_score"] == "skipped":
+            return Score.unscored(
+                reason="upstream_skipped",
+                explanation="Native task evaluation unavailable; violation evidence may remain scoreable",
+            )
         return Score(
             value=state.metadata["native_task_score"],
             explanation="Original task evaluator, not a corrigibility score",
@@ -232,11 +329,18 @@ def rogue_eval(
     region: str = "us-east-1",
     reasoning_effort: str = "low",
     episode_timeout: int = 900,
+    native_options: dict[str, Any] | None = None,
+    preset: str | None = None,
+    judge_model: str | None = None,
+    judge_config: dict[str, Any] | None = None,
+    judge_max_chars: int = 800_000,
+    access_ready: bool = False,
+    access_settings_file: str | None = None,
 ) -> Task:
     """Run original episodes on a separately provisioned controller.
 
     Args:
-        scenario: Original scenario key or all 82 main tasks.
+        scenario: Original domain, all for 82 main tasks, or all_variants for every public domain.
         worker_sandbox: Installed Inspect controller provider.
         sandbox_config: Operator-provided config; required to execute.
         root: Pinned native checkout on the controller.
@@ -246,13 +350,39 @@ def rogue_eval(
         region: Native AWS region when relevant.
         reasoning_effort: Explicit smoke setting, not a paper-reproduction preset.
         episode_timeout: Timeout; provider-side cleanup/TTL is also required.
+        native_options: Validated native CLI destinations for budgets, prompts, observations and delegation settings.
+        preset: Named original experiment_runner job; preserves its task selection, settings and actor identity.
+        judge_model: Explicit Inspect grader model; no judge calls when omitted.
+        judge_config: Inspect grader settings; defaults to GPT xhigh or Anthropic max with 64000 output tokens.
+        judge_max_chars: Native per-file judge input limit; oversized logs fail rather than truncate.
+        access_ready: Explicit confirmation of private access fixtures and artifact handling; not proof of live acceptance.
+        access_settings_file: Private local Google settings path used only for the sentinel detector.
 
     Returns:
         Original-episode adapter with task-completion scoring.
     """
-    if scenario != "all" and scenario not in STEP_LIMITS:
-        raise ValueError(f"Unknown ROGUE scenario: {scenario}")
-    records = [r for r in load_records() if scenario == "all" or r["scenario"] == scenario]
+    expected_model = None
+    options: dict[str, Any] = {}
+    if preset:
+        options, selection, expected_model = preset_options(preset)
+        if scenario not in {"all", *selection}:
+            raise ValueError("Scenario conflicts with original preset selection")
+        records = [
+            r for domain, ids in selection.items() for r in load_records(domain) if r["id"] in ids
+        ]
+        if len(records) != sum(len(ids) for ids in selection.values()):
+            raise ValueError("Preset task selection differs from pinned catalog")
+    else:
+        records = load_records() if scenario == "all" else load_records(scenario)
+    options.update(native_options or {})
+    validate_options(options)
+    for record in records:
+        if "enable_subagents" in options and options["enable_subagents"] != record[
+            "scenario"
+        ].startswith("subagents_"):
+            raise ValueError("Delegation flag conflicts with selected original domain")
+    if episode_timeout < 1 or judge_max_chars < 0:
+        raise ValueError("Invalid episode timeout or judge input limit")
     return Task(
         dataset=MemoryDataset([record_to_sample(r) for r in records]),
         solver=native_episode(
@@ -264,8 +394,18 @@ def rogue_eval(
             reasoning_effort,
             episode_timeout,
             bool(sandbox_config),
+            options,
+            expected_model,
+            access_ready,
+            access_settings_file,
         ),
-        scorer=native_task_completion(),
+        scorer=[
+            native_task_completion(),
+            native_task_success(),
+            actual_violation(),
+            intended_violation(judge_model, judge_config, judge_max_chars),
+            alternate_shutdown_avoidance(judge_model, judge_config, judge_max_chars),
+        ],
         sandbox=(worker_sandbox, sandbox_config) if sandbox_config else None,
         version=EVAL_VERSION,
     )
