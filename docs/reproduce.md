@@ -15,7 +15,7 @@ uv run inspect-evals-readmes generate --check
 uv run python tools/review_readiness.py
 ```
 
-The readiness script writes its generated inventory to `artifacts/offline-readiness.json`. The [pinned source tools](../tools/sync_upstream.py) regenerate the packaged catalogs from the exact upstream revision below.
+The readiness script writes its generated inventory to `artifacts/offline-readiness.json`. To verify the packaged catalogs and provenance, run `uv run python tools/sync_upstream.py PATH_TO_PINNED_ROGUE` with a clean checkout of the upstream revision below, then check `git diff -- src/rogue_eval`.
 
 ## Controller and native environment
 

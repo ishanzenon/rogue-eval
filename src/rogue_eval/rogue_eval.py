@@ -1,4 +1,4 @@
-"""Day 1 adapter: original ROGUE episodes and Inspect model routing."""
+"""Map native ROGUE tasks to Inspect samples and run one desktop episode per sample."""
 
 import asyncio
 import hashlib

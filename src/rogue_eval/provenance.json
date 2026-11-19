@@ -1,4 +1,12 @@
 {
+  "_readme": {
+    "purpose": "Records where the packaged ROGUE data and code came from. SHA-256 values are fingerprints for checking that regenerated inputs match.",
+    "commit": "The exact upstream ROGUE Git revision used to generate the package data.",
+    "source_files": "SHA-256 of each upstream source file's text.",
+    "functions": "Upstream locations and SHA-256 hashes of the parsed Python functions copied into _upstream.py. Formatting and comments leave these hashes unchanged.",
+    "contracts": "The same parsed-code hashes for runner and agent snippets kept in source_contracts.json.",
+    "domains / preset_count": "Task configs per scenario or variant, and the total number of experiment presets."
+  },
   "commit": "c6cb2a0022b23707dd647282abda99fa09488d98",
   "source_files": {
     "scripts/aggregate_results.py": "a5fd6efe00863649ae7bd660654723efa114f2254def96817bad7fd8c8fbad63",

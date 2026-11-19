@@ -1,4 +1,4 @@
-"""ROGUE evidence parsing, original judge prompts and separate Inspect scores."""
+"""Turn native task results, scenario evidence, and judge decisions into Inspect scores."""
 
 import asyncio
 import json

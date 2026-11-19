@@ -252,6 +252,14 @@ def scenario_config(scenario):
     write_json(
         "provenance.json",
         {
+            "_readme": {
+                "purpose": "Records where the packaged ROGUE data and code came from. SHA-256 values are fingerprints for checking that regenerated inputs match.",
+                "commit": "The exact upstream ROGUE Git revision used to generate the package data.",
+                "source_files": "SHA-256 of each upstream source file's text.",
+                "functions": "Upstream locations and SHA-256 hashes of the parsed Python functions copied into _upstream.py. Formatting and comments leave these hashes unchanged.",
+                "contracts": "The same parsed-code hashes for runner and agent snippets kept in source_contracts.json.",
+                "domains / preset_count": "Task configs per scenario or variant, and the total number of experiment presets.",
+            },
             "commit": PIN,
             "source_files": {p: hashlib.sha256(t.encode()).hexdigest() for p, t in source.items()},
             "functions": functions,

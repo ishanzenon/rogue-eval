@@ -1,4 +1,4 @@
-"""Offline checks for the original dataset map and native episode adapter."""
+"""Check sample mapping, bridge routing, and evidence retention with a mocked worker."""
 
 import hashlib
 import json

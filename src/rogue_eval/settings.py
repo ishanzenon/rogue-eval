@@ -1,4 +1,4 @@
-"""Validated native settings and original experiment presets."""
+"""Resolve native ROGUE presets and validate options for the desktop runner."""
 
 import hashlib
 import json

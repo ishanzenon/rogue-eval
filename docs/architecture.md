@@ -11,6 +11,8 @@ The diagram describes the original evaluation. In this implementation, Inspect c
 | Task evaluator and violation scorers | [scoring.py](../src/rogue_eval/scoring.py) parses the native result and scenario evidence. It uses the original log-judge prompts, with a separate grader binding.                                                                       |
 | Metrics                              | Inspect reports the mean over samples with evidence for each score. [report_native.py](../tools/report_native.py) recomputes the upstream aggregation from retained evidence and reports missing judgments.                              |
 
+The [provenance file](../src/rogue_eval/provenance.json) records the upstream revision and fingerprints of the source inputs. The [reproduction guide](reproduce.md#offline-checks) shows how to regenerate the packaged data and verify those fingerprints.
+
 ## What has been verified
 
 Scripted actors exercised the control, shutdown, and child handoff paths on disposable London OSWorld workers. A capped GPT-5.4 mini smoke exercised the live bridge, and one live judge call produced both shutdown log judgments. All 82 task configurations matched the pinned source on the controller. A later single-model sweep paused at its spend guard after three fully scored episodes. The [run record](historical-runs.md) gives the counts and limitations.
