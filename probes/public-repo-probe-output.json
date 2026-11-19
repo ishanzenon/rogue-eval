@@ -1,6 +1,0 @@
-{
-  "job_id": "rogue-prerequisite-probe-p4bf4oxbmvgy377j",
-  "messages": [
-    "ROGUE_INFRASTRUCTURE_PROBE {\"architecture\": \"x86_64\", \"binaries\": {\"Xvfb\": null, \"chromium\": null, \"docker\": null, \"qemu-img\": null, \"qemu-system-x86_64\": null}, \"docker_socket_present\": false, \"kernel\": \"6.18.51\", \"kvm_device_present\": false, \"kvm_usable\": false, \"network\": {\"accounts.google.com\": {\"dns\": true, \"https_status\": 302}, \"docs.google.com\": {\"dns\": true, \"https_status\": 302}, \"drive.google.com\": {\"dns\": true, \"https_status\": 302}}}"
-  ]
-}

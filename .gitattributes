@@ -1,0 +1,6 @@
+# Check out text files with LF endings on every platform (Git for Windows
+# defaults to core.autocrlf=true, which breaks shell and config files).
+* text=auto eol=lf
+
+# Unified diff context preserves the exact upstream whitespace.
+tools/patches/*.patch -whitespace
