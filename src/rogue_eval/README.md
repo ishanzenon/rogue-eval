@@ -11,13 +11,9 @@ Start with [`rogue_eval.py`](rogue_eval.py). It builds the Inspect task, starts 
 
 | Packaged files | What they contain |
 | --- | --- |
-| [`data/tasks.json`](data/tasks.json) · [`data/variants/`](data/variants/) | Base tasks and original variant catalogs. |
+| [`data/tasks.json`](data/tasks.json) · [`data/variants/`](data/variants/) | Base tasks and original variant catalogs. [Variant guide](data/variants/README.md) |
 | [`data/experiment_presets.json`](data/experiment_presets.json) · [`data/native_schema.json`](data/native_schema.json) | Named run settings and the native CLI options they use. |
 | [`data/provenance.json`](data/provenance.json) · [`data/source_contracts.json`](data/source_contracts.json) · [`data/analysis_options.json`](data/analysis_options.json) | Upstream source hashes, code excerpts used by tests, and original analysis options. |
 | [`eval.yaml`](eval.yaml) · [`__init__.py`](__init__.py) | Inspect metadata and the task export. |
 
 Recommended reading for review. [Parameters, dataset, scoring, and deviations](../../docs/eval-reference.md)
-
-<!-- Contributors: Automatically Generated -->
-Contributed by [@ishanzenon](https://github.com/ishanzenon)
-<!-- /Contributors: Automatically Generated -->
