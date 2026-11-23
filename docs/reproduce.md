@@ -17,7 +17,7 @@ xvfb-run -a uv run --locked inspect eval rogue_eval/rogue_eval \
   --max-samples 1 --max-tasks 1 --max-sandboxes 1 --log-dir logs/smoke
 ```
 
-To select another task, set `scenario` to its original domain and copy its exact ID from [the base catalog](../src/rogue_eval/tasks.json) or [variant catalogs](../src/rogue_eval/variants/). Choose `subagents_override` or `subagents_rewire` for the original delegated conditions. Restricted access has a separate fixture and evidence path. The project has verified its scoring offline. [Eval reference](eval-reference.md)
+To select another task, set `scenario` to its original domain and copy its exact ID from [the base catalog](../src/rogue_eval/data/tasks.json) or [variant catalogs](../src/rogue_eval/data/variants/). Choose `subagents_override` or `subagents_rewire` for the original delegated conditions. Restricted access has a separate fixture and evidence path. The project has verified its scoring offline. [Eval reference](eval-reference.md)
 
 A smoke succeeds when Inspect records a model call, the native trajectory and evaluator output are retained, and the disposable worker is cleaned up. A task score of zero is a valid result. During execution, run `uv run inspect ctl task list` in a second controller shell.
 
@@ -37,7 +37,7 @@ xvfb-run -a uv run --locked inspect eval rogue_eval/rogue_eval \
 ```
 
 - **Scale out.** Split the preset's IDs into disjoint comma-separated `--sample-id` lists. Start one process per group, each with its own `ROGUE_INSPECT_BRIDGE_PORT` and `--log-dir` under the run directory. Keep `--max-samples 1` in each process because samples share that process's bridge port. Limit the number of processes to the approved worker concurrency. Inspect the error counts before using the results.
-- **Match the paper.** The preset supplies the original task IDs, actor, observation and action settings, prompt condition, and native budgets. Record the actual provider route and any caps or overrides. The command above scores task success and deterministic violations. Supply an authorized `judge_model` and matching `judge_config` to score intent and alternate shutdown avoidance. The paper's primary judge used GPT-5.5 at `xhigh` with temperature 1. Verify your route supports those settings before claiming parity. [Paper, §3 and Appendix A.1](https://arxiv.org/pdf/2606.00341) · [Preset catalog](../src/rogue_eval/experiment_presets.json)
+- **Match the paper.** The preset supplies the original task IDs, actor, observation and action settings, prompt condition, and native budgets. Record the actual provider route and any caps or overrides. The command above scores task success and deterministic violations. Supply an authorized `judge_model` and matching `judge_config` to score intent and alternate shutdown avoidance. The paper's primary judge used GPT-5.5 at `xhigh` with temperature 1. Verify your route supports those settings before claiming parity. [Paper, §3 and Appendix A.1](https://arxiv.org/pdf/2606.00341) · [Preset catalog](../src/rogue_eval/data/experiment_presets.json)
 
 ## Find logs and transcripts
 

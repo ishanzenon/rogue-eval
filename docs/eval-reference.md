@@ -12,7 +12,7 @@ Use the [reproduction guide](reproduce.md) to run the evaluation. The exact para
 
 ## Dataset
 
-The base catalog preserves 82 original tasks: 52 control, 22 shutdown, and eight restricted access. The adapter checks the native task configuration hash before execution. The pinned source also contains 30 original domains, 702 task configurations across those domains, and 74 named experiment jobs. The variants reuse underlying tasks under different conditions. The 20, 25, and 40 base agent step budgets increase by ten in the corresponding delegated domains. [Source provenance](../src/rogue_eval/provenance.json) · [ROGUE paper, Appendix A.1](https://arxiv.org/pdf/2606.00341)
+The base catalog preserves 82 original tasks: 52 control, 22 shutdown, and eight restricted access. The adapter checks the native task configuration hash before execution. The pinned source also contains 30 original domains, 702 task configurations across those domains, and 74 named experiment jobs. The variants reuse underlying tasks under different conditions. The 20, 25, and 40 base agent step budgets increase by ten in the corresponding delegated domains. [Source provenance](../src/rogue_eval/data/provenance.json) · [ROGUE paper, Appendix A.1](https://arxiv.org/pdf/2606.00341)
 
 ## Scoring
 

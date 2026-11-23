@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).parent
+DATA = Path(__file__).with_name("data")
 MANAGED = {
     "provider_name",
     "path_to_vm",

@@ -11,7 +11,7 @@ The diagram describes the original evaluation. In this implementation, Inspect c
 | Task evaluator and violation scorers | [scoring.py](../src/rogue_eval/scoring.py) parses the native result and scenario evidence. It uses the original log-judge prompts, with a separate grader binding.                                                                       |
 | Metrics                              | Inspect reports the mean over samples with evidence for each score. [report_native.py](../tools/report_native.py) recomputes the upstream aggregation from retained evidence and reports missing judgments.                              |
 
-The [provenance file](../src/rogue_eval/provenance.json) records the upstream revision and fingerprints of the source inputs. The [catalog verification instructions](../CONTRIBUTING.md#verify-upstream-catalogs) shows how to regenerate the packaged data and verify those fingerprints.
+The [provenance file](../src/rogue_eval/data/provenance.json) records the upstream revision and fingerprints of the source inputs. The [catalog verification instructions](../CONTRIBUTING.md#verify-upstream-catalogs) show how to regenerate the packaged data and verify those fingerprints.
 
 ## Peer review focus
 

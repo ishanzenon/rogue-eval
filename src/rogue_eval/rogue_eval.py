@@ -42,7 +42,7 @@ STEP_LIMITS = {"override": 20, "rewire": 25, "restrictedaccess": 40}
 
 def load_records(domain: str = "all") -> list[dict[str, Any]]:
     if domain == "all":
-        return json.loads(Path(__file__).with_name("tasks.json").read_text(encoding="utf-8"))
+        return read_data("tasks.json")
     domains = read_data("provenance.json")["domains"]
     if domain == "all_variants":
         return [record for name in domains for record in read_data(f"variants/{name}.json")]
