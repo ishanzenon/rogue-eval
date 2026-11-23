@@ -17,3 +17,4 @@ Run the offline checks with `uv sync --locked` and `uv run pytest`. For a live c
 - [Architecture and code map](docs/architecture.md) for a walkthrough of one episode.
 - [Eval reference](src/rogue_eval/README.md) for parameters, presets, and scoring details.
 - [Historical runs](docs/historical-runs.md) for prior checks, evidence limits, and archived probe commands.
+- [ROGUE paper](https://arxiv.org/abs/2606.00341) and [project demos](https://neuroagents-lab.github.io/ROGUE/) for the benchmark design and example episodes.
