@@ -2,7 +2,16 @@
 
 Use this once for the smoke test or a larger run. Run commands from the repository root on a dedicated Ubuntu controller. The controller runs Inspect and the native ROGUE harness. ROGUE boots a fresh OSWorld desktop on EC2 for each episode.
 
-## 1. Provision the controller and desktop workers
+## 1. Install controller prerequisites
+
+```bash
+sudo apt-get update
+sudo apt-get install -y git build-essential linux-libc-dev xvfb xauth unzip
+```
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and the [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html). Make both available on `PATH` in the shell that runs Inspect. The AWS CLI is used for the preflight below.
+
+## 2. Provision the controller and desktop workers
 
 | Resource | Verified project setup | ROGUE paper |
 | --- | --- | --- |
@@ -42,12 +51,9 @@ aws ec2 run-instances --region "$AWS_REGION" \
 
 `DryRunOperation` is the expected authorization result and exits nonzero. Before scaling, verify a private screenshot, reset to a new guest from the AMI, and cloud-side expiry of a test worker. The smoke test also checks the adapter's normal cleanup.
 
-## 2. Install Inspect and the pinned native runner
-
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and the [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) on the controller.
+## 3. Install Inspect and the pinned native runner
 
 ```bash
-sudo apt-get install -y git build-essential linux-libc-dev xvfb xauth
 uv sync --locked
 uv run pytest
 
@@ -73,7 +79,7 @@ Inspect uses Python 3.13 from the repository lockfile. Keep the native checkout 
 | [`patches/rogue-inspect-responses.patch`](patches/rogue-inspect-responses.patch) | Lets the pinned native runner handle split reasoning and action items returned through Inspect's Responses bridge. |
 | [`tools/`](../../tools/) Python scripts | Check package readiness, sync catalogs from a separate clean pinned checkout, and report scores from saved native evidence. |
 
-## 3. Configure inference on the controller
+## 4. Configure inference on the controller
 
 The worked commands use the GPT Responses route. Use a direct OpenAI API credential provided to the controller as `OPENAI_API_KEY` and set `ROGUE_ACTOR=openai/gpt-5.4-mini`, or use the project's GL Hawk gateway below. Start in a shell with the desired endpoint and credentials before launching Inspect.
 
@@ -82,7 +88,7 @@ For GL, install the [Hawk CLI](https://hawk.metr.org/getting-started/installatio
 ```bash
 export HAWK_API_URL=https://api.hawk.hawk.generalitylabs.ai
 export HAWK_LOG_VIEWER_URL=https://viewer.hawk.hawk.generalitylabs.ai
-hawk auth login
+hawk auth login --no-browser
 export OPENAI_BASE_URL=https://middleman.hawk.generalitylabs.ai/openai/v1
 export OPENAI_API_KEY="$(hawk auth access-token)"
 export ROGUE_ACTOR=openai/openrouter/openai/gpt-5.4-mini
