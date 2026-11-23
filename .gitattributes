@@ -3,4 +3,4 @@
 * text=auto eol=lf
 
 # Unified diff context preserves the exact upstream whitespace.
-tools/patches/*.patch -whitespace
+docs/setup/patches/*.patch -whitespace

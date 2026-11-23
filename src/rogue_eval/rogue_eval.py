@@ -167,7 +167,9 @@ def native_episode(
         model = get_model()
         model_spec = str(ModelName(model))
         if not model_spec.startswith("openai/"):
-            raise RuntimeError("Day 1 validates OpenAI actor routing first")
+            raise RuntimeError(
+                "The native runner requires an OpenAI-compatible Inspect actor route"
+            )
         # ROGUE identifies GPT capabilities from the native name. The bridge
         # keeps the full routed model on its other side.
         alias = model.name.removeprefix("openrouter/openai/")

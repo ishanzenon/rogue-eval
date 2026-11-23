@@ -29,4 +29,10 @@ Run the old Hawk configs only in the deployment that supplies their sandbox type
 - The live queue used GPT-5.4 mini xhigh with 4,096 then 12,288 output-token ceilings and a GPT-5.4 mini low-effort grader. The [published rates](https://neuroagents-lab.github.io/ROGUE/leaderboard-data.json) use different coverage and a different intent grader. The available sample is insufficient for a replication claim.
 - The peer evidence bundle contains redacted model-turn timelines and score values for the controlled, bridge, judge, and overnight logs. Raw Inspect logs and native archives remain with the operator. The optional controller smoke and queue utilities are also available in the private bundle for an operator with the original environment.
 
-For a standalone evidence check, use the [offline report instructions](reproduce.md#one-control-smoke). To repeat the earlier overnight audit, use the captured operator tooling and its recorded scope and budget. Start with a single smoke before enabling the queue.
+For a standalone evidence check, use the [offline report instructions](reproduce.md#reconcile-saved-scores). To repeat the earlier overnight audit, use the captured operator tooling and its recorded scope and budget. Start with a single smoke before enabling the queue.
+
+## November 23 Opus 4.7 runs
+
+- Ten live episodes exercised control and shutdown on the same London controller, with original tasks and a mix of base and variant prompts. The actor used `high` reasoning. The optional log judge was unscored. [Hawk eval set](https://viewer.hawk.hawk.generalitylabs.ai/eval-set/imported-rogue-claude-opu-6zzayydzpirn16eq)
+- Two further episodes exercised the original subagent conditions. Both native traces recorded child activity. [Hawk eval set](https://viewer.hawk.hawk.generalitylabs.ai/eval-set/imported-rogue-claude-opu-89nb42e14kwemsbr)
+- Restricted-access scoring was checked offline with synthetic evidence. [Hawk eval set](https://viewer.hawk.hawk.generalitylabs.ai/eval-set/imported-rogue-restricted-e1ygvsuwy7ltb07i)

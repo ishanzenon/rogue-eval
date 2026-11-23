@@ -13,9 +13,7 @@ updates:
     ignore:
       # Generality Labs' reusable workflows are referenced by moving major tag
       # on purpose (see .github/zizmor.yml), so template CI fixes flow in
-      # without a bump PR per release. Left un-ignored, Dependabot rewrites
-      # `@v1` to a fixed `@v1.x.y` and re-bumps it on every release, and
-      # `copier update` restores the moving tag, so the two fight forever.
+      # without a bump PR per release. Keep the moving major reference.
       - dependency-name: "Generality-Labs/*"
 
   # Keep Python dependencies (pyproject.toml + uv.lock) current.

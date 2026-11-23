@@ -1,41 +1,14 @@
-# Contributing to rogue-eval
+# Contributing
 
-## Running tests
+Run `uv sync --locked`, then use `make test` for the offline suite and `make check` for lint, type checking, eval metadata, generated README sections, and pre-commit checks. The suite uses mocked models and workers. For an actual desktop run, see the [reproduction guide](docs/reproduce.md).
 
-`make test` runs the test suite. The test gates, markers and fixtures come from the [pytest-inspect-evals](https://github.com/Generality-Labs/pytest-inspect-evals) plugin.
+Update the version in [`src/rogue_eval/eval.yaml`](src/rogue_eval/eval.yaml) when a change can move scores. Run `make readmes` after changing generated README data. [Inspect Evals versioning](https://github.com/UKGovernmentBEIS/inspect_evals/blob/main/TASK_VERSIONING.md)
 
-| Marker             | Runs by default | Enable with                                                |
-| ------------------ | --------------- | ---------------------------------------------------------- |
-| `slow`             | no              | `uv run pytest --runslow` or `RUN_SLOW_TESTS=1`            |
-| `dataset_download` | yes, here       | `--dataset-download`; `RUN_DATASET_DOWNLOAD_TESTS=0` skips |
-| `gpu`              | no              | `uv run pytest --rungpu` or `RUN_GPU_TESTS=1`              |
-| `docker`           | yes             | skipped on Windows                                         |
-| `huggingface`      | yes             | retried twice; a summary notice when `HF_TOKEN` is unset   |
-| `posix_only`       | yes             | skipped on Windows                                         |
+## Verify upstream catalogs
 
-Use `mockllm/model` for model output in tests, `unittest.mock` for external services and `tmp_path` for files. A test that reaches the network needs a marker:
+Use a separate, clean checkout of ROGUE at `c6cb2a0022b23707dd647282abda99fa09488d98`. The sync command rewrites the packaged files from that checkout. An unchanged pin should produce an empty diff.
 
-- `dataset_download` for a test that downloads a dataset.
-- `huggingface` for a test that calls the Hugging Face Hub. A test that downloads a dataset from the Hub carries both markers. The plugin retries a failed `huggingface` test twice and reports a gated-dataset error as a skip.
-
-Tests marked `huggingface` run when `HF_TOKEN` is unset, and the test summary then says how many ran without authentication. CI does not pass `HF_TOKEN` to pytest, because the shared `python-ci.yml` workflow takes no secrets. A public dataset needs no token. A test that needs a private dataset fails in CI, and passes on a machine that has the token in its environment or in `.env`.
-
-## Checks
-
-`make check` runs the checks CI runs:
-
-- `ruff check` and `ruff format --check`
-- `basedpyright src tests` in standard mode
-- `inspect-evals-lint --all` (the rules are documented one per page at [inspect-evals-lint](https://github.com/Generality-Labs/inspect-evals-lint/tree/main/docs/rules))
-- `inspect-evals-readmes generate --check`, which fails when the README sections generated from `eval.yaml` and the task signatures are out of date (`make readmes` regenerates them)
-- `pre-commit run --all-files` (zizmor, actionlint, mdformat, uv-lock and the standard hooks)
-
-`uv run pre-commit install` runs the hooks on every commit.
-
-## eval.yaml
-
-`src/rogue_eval/eval.yaml` holds the eval's title, description, contributors, version and tasks. The fields are documented in the [eval.yaml reference](https://github.com/UKGovernmentBEIS/inspect_evals/blob/main/CONTRIBUTING.md#evalyaml-reference) in inspect_evals. Bump `version` whenever a change can move scores; [TASK_VERSIONING.md](https://github.com/UKGovernmentBEIS/inspect_evals/blob/main/TASK_VERSIONING.md) explains the format.
-
-## Submitting to the inspect_evals register
-
-Evals hosted in their own repo are listed in inspect_evals through a metadata entry. Read [register/README.md](https://github.com/UKGovernmentBEIS/inspect_evals/blob/main/register/README.md) and open a [Register Eval Submission](https://github.com/UKGovernmentBEIS/inspect_evals/issues/new?template=register-submission.yml) issue when the eval is ready.
+```bash
+uv run python tools/sync_upstream.py PATH_TO_CLEAN_PINNED_ROGUE
+git diff --exit-code -- src/rogue_eval
+```
