@@ -1,0 +1,98 @@
+[
+  {
+    "flags": [
+      "--results_root"
+    ],
+    "source": "parser.add_argument(\n        \"--results_root\",\n        type=str,\n        default=DEFAULT_RESULTS_ROOT,\n        help=\"Root directory containing scenario folders such as results/override/base.\",\n    )"
+  },
+  {
+    "flags": [
+      "--judge-model"
+    ],
+    "source": "parser.add_argument(\n        \"--judge-model\",\n        type=str,\n        default=DEFAULT_JUDGE_MODEL,\n        help=\"Primary GPT judge model name. Existing metrics remain based on this judge.\",\n    )"
+  },
+  {
+    "flags": [
+      "--judge-reasoning-effort"
+    ],
+    "source": "parser.add_argument(\n        \"--judge-reasoning-effort\",\n        type=str,\n        default=DEFAULT_JUDGE_REASONING_EFFORT,\n        help=\"Reasoning effort/level for the primary GPT judge.\",\n    )"
+  },
+  {
+    "flags": [
+      "--judge-targets"
+    ],
+    "source": "parser.add_argument(\n        \"--judge-targets\",\n        nargs=\"+\",\n        choices=SUPPORTED_JUDGE_TARGETS,\n        default=[OPENAI_JUDGE_TARGET],\n        help=(\n            \"Providers allowed to receive API calls. Defaults to gpt-5.5-xhigh. \"\n            \"Select claude-opus-4.7-max alone for a Claude-only backfill.\"\n        ),\n    )"
+  },
+  {
+    "flags": [
+      "--judge-mode"
+    ],
+    "source": "parser.add_argument(\n        \"--judge-mode\",\n        choices=(\"auto\", \"cache_only\", \"refresh\"),\n        default=\"auto\",\n        help=(\n            \"auto=reuse cache and fill selected-target misses via API, \"\n            \"cache_only=never call an API, refresh=regenerate selected targets only.\"\n        ),\n    )"
+  },
+  {
+    "flags": [
+      "--judge-preflight"
+    ],
+    "source": "parser.add_argument(\n        \"--judge-preflight\",\n        action=\"store_true\",\n        help=\"Report cache coverage and planned calls without API calls or file writes.\",\n    )"
+  },
+  {
+    "flags": [
+      "--openai-batch-action"
+    ],
+    "source": "parser.add_argument(\n        \"--openai-batch-action\",\n        choices=(\"submit\", \"status\", \"apply\"),\n        default=None,\n        help=(\n            \"Use OpenAI's asynchronous Batch API for the GPT-only judge: submit \"\n            \"JSONL, check status, or apply completed results.\"\n        ),\n    )"
+  },
+  {
+    "flags": [
+      "--openai-batch-state"
+    ],
+    "source": "parser.add_argument(\n        \"--openai-batch-state\",\n        type=str,\n        default=None,\n        help=(\n            \"Batch state JSON path. Defaults to \"\n            \"<results_root>/summary/openai_judge_batch_state.json.\"\n        ),\n    )"
+  },
+  {
+    "flags": [
+      "--claude-batch-action"
+    ],
+    "source": "parser.add_argument(\n        \"--claude-batch-action\",\n        choices=(\"submit\", \"status\", \"apply\"),\n        default=None,\n        help=(\n            \"Use Anthropic's asynchronous Message Batches API for the Claude-only \"\n            \"judge: submit a batch, check status, or apply completed results.\"\n        ),\n    )"
+  },
+  {
+    "flags": [
+      "--claude-batch-state"
+    ],
+    "source": "parser.add_argument(\n        \"--claude-batch-state\",\n        type=str,\n        default=None,\n        help=(\n            \"Batch state JSON path. Defaults to \"\n            \"<results_root>/summary/claude_judge_batch_state.json.\"\n        ),\n    )"
+  },
+  {
+    "flags": [
+      "--claude-max-output-tokens"
+    ],
+    "source": "parser.add_argument(\n        \"--claude-max-output-tokens\",\n        type=int,\n        default=DEFAULT_CLAUDE_JUDGE_MAX_TOKENS,\n        help=\"Maximum output tokens for Claude judge calls (default: 64000).\",\n    )"
+  },
+  {
+    "flags": [
+      "--max-chars-per-file"
+    ],
+    "source": "parser.add_argument(\n        \"--max-chars-per-file\",\n        type=int,\n        default=DEFAULT_MAX_CHARS_PER_FILE,\n        help=\"Maximum number of characters from each log file to pass to the judge.\",\n    )"
+  },
+  {
+    "flags": [
+      "--request-timeout"
+    ],
+    "source": "parser.add_argument(\n        \"--request-timeout\",\n        type=int,\n        default=600,\n        help=\"Timeout in seconds for each judge API call.\",\n    )"
+  },
+  {
+    "flags": [
+      "--max-retries"
+    ],
+    "source": "parser.add_argument(\n        \"--max-retries\",\n        type=int,\n        default=3,\n        help=\"Maximum number of retries for each judge API call.\",\n    )"
+  },
+  {
+    "flags": [
+      "--continue-on-judge-error"
+    ],
+    "source": "parser.add_argument(\n        \"--continue-on-judge-error\",\n        action=\"store_true\",\n        help=(\n            \"Record judge API failures on individual tasks and continue aggregating \"\n            \"instead of aborting the run.\"\n        ),\n    )"
+  },
+  {
+    "flags": [
+      "--scenarios"
+    ],
+    "source": "parser.add_argument(\n        \"--scenarios\",\n        nargs=\"*\",\n        default=None,\n        help=(\n            \"Scenarios to aggregate. Defaults to override rewire restrictedaccess, \"\n            \"or subagents_override subagents_rewire subagents_restrictedaccess when \"\n            \"--results_root ends with subagents.\"\n        ),\n    )"
+  }
+]

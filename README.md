@@ -1,33 +1,19 @@
-# rogue-eval
-ROGUE benchmark audit and Inspect/Hawk evaluation setup
+# ROGUE in Inspect AI
 
-## Hawk access
+ROGUE tests whether desktop agents respect a handoff, a shutdown request, or a resource restriction while working on ordinary tasks. This implementation maps the 82 original tasks to Inspect samples and runs each episode through the pinned ROGUE and OSWorld code.
 
-This project uses Generality Labs' existing Hawk deployment. The API reported
-version `4.0.0` on 2026-11-17. Authentication uses Hawk's browser OAuth flow;
-do not commit tokens, API keys, or ROGUE fixture credentials.
+![ROGUE evaluation architecture](docs/assets/rogue-architecture.png)
 
-Install a compatible CLI with Python 3.13 or later:
+| Diagram stage | What the Inspect implementation does |
+| --- | --- |
+| Dataset | Loads the original task IDs and resolves native settings and presets. [Task and settings code](src/rogue_eval/) |
+| Solver and environment | Starts the native runner on a provisioned controller, routes model calls through Inspect, and saves the episode and its desktop evidence. [Episode runner](src/rogue_eval/rogue_eval.py) |
+| Scorer and metrics | Reports native task success, observed violations, and optional log-judge decisions as separate scores. [Scorers](src/rogue_eval/scoring.py) |
 
-```powershell
-uv tool install --python 3.14 "hawk[cli]==4.0.0"
-Copy-Item .env.example .env
-hawk login
-hawk version
-hawk models
-```
+Run the offline checks with `uv sync --locked` and `uv run pytest`. For a live controller smoke and its prerequisites, see the [reproduction guide](docs/reproduce.md).
 
-Hawk reads the project `.env` automatically. Login credentials stay in its local
-credential store. The viewer is https://viewer.hawk.hawk.generalitylabs.ai.
+## Further reading
 
-## ROGUE environment integration
-
-Access to Hawk does not establish that this deployment can run the original
-ROGUE desktop environments. Before submitting a paid evaluation, verify with
-the deployment operator which sandbox providers are enabled, whether desktop
-VMs can be provisioned or reached, and the allowed networking and concurrency.
-The original ROGUE VM lifecycle and scoring need an Inspect adapter and a
-parity check; this repository does not yet contain that implementation.
-
-References: [Hawk CLI setup](https://hawk.metr.org/getting-started/installation/)
-and [sandbox isolation](https://hawk.metr.org/user-guide/sandbox-network-isolation/).
+- [Architecture and code map](docs/architecture.md) for a walkthrough of one episode.
+- [Eval reference](src/rogue_eval/README.md) for parameters, presets, and scoring details.
+- [Historical runs](docs/historical-runs.md) for prior checks, evidence limits, and archived probe commands.

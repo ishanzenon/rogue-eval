@@ -1,0 +1,176 @@
+{
+  "_readme": {
+    "purpose": "Records where the packaged ROGUE data and code came from. SHA-256 values are fingerprints for checking that regenerated inputs match.",
+    "commit": "The exact upstream ROGUE Git revision used to generate the package data.",
+    "source_files": "SHA-256 of each upstream source file's text.",
+    "functions": "Upstream locations and SHA-256 hashes of the parsed Python functions copied into _upstream.py. Formatting and comments leave these hashes unchanged.",
+    "contracts": "The same parsed-code hashes for runner and agent snippets kept in source_contracts.json.",
+    "domains / preset_count": "Task configs per scenario or variant, and the total number of experiment presets."
+  },
+  "commit": "c6cb2a0022b23707dd647282abda99fa09488d98",
+  "source_files": {
+    "scripts/aggregate_results.py": "a5fd6efe00863649ae7bd660654723efa114f2254def96817bad7fd8c8fbad63",
+    "scripts/calc_override_score.py": "91c15fb80ed3d16e4bc5d216cb439cee7148047ea31c9296aafa386b7b004c71",
+    "task_utils.py": "1d0147fdae7a47aa06bb96caf97c0f2b09fb707632d842e505707ffd36d692ac",
+    "lib_run_litellm.py": "ca1566fb338c9673001743766839cfb736673db5ffc2200352bcd7ac7f58876c",
+    "desktop_env/recording.py": "c0850c81d2c641e3eee281a4fc02320bd0657d398782e806ef97bd6e6d901802",
+    "scripts/experiment_runner.sh": "e93de5b63d47f857a131a076e5579c1345ad5af6a96d55d68015a7cd822a2850",
+    "desktop_env/desktop_env.py": "a91607023ad1996b180e2faf556763af8c08ca6bade8a3e9aaff370105d83e0b",
+    "mm_agents/agent_litellm.py": "af170776acdaf4ccf1d4efa930561d84d6fe47e55aa432f89e55947f492a2ab7",
+    "lib_run_single.py": "8c371eec4de3e0abc2a3fb62555d7bdc2510ca5b495740106f756f5b004134f6"
+  },
+  "functions": {
+    "read_text": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "3b0195c1b075ba9fa657da42151595249cd79ba87ab03d2ec2be31f84c06cf19"
+    },
+    "read_json": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "b1eb670fe4556572c75c94f3202a97cff92dc005d22059a30daafb35d2528682"
+    },
+    "compute_task_success": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "8537ea1ea962f43878738b1e6f94e27d3fba6efee9972131641434bfde53d30e"
+    },
+    "password_sentinel_similarity": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "dbdfbd6bc14bcca36ce2a47ccc3170f490fd38858f65045b44b895032ac5e065"
+    },
+    "find_password_sentinel_variant": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "9de2f7b81ae0f1c53f1387df5db90817b71527749c9d867346fed409223da5a6"
+    },
+    "strip_runtime_a11y_tree": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "0c2d28984695da262e365575e6acb4f9a75f39e5c61bb3f958a250b8bc64ea57"
+    },
+    "extract_reasoning_text": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "2869d3a167f40f2ddfef0dc488a1eba05f1e9cda7ca1127023481105d40530b9"
+    },
+    "normalize_judge_logs": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "19d0f55d998ad25bc62f8847fc56b2c3dd32151c97935687035a7047454ccfad"
+    },
+    "extract_json_object": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "a91c2cd259d8cdc5fb68db88914c3917e593935f41d4215acd482ab40b19eb30"
+    },
+    "build_override_prompts": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "497bb58be22d59a8df61ad159db0ae764456713048e05975a1bb8a248c51e089"
+    },
+    "build_rewire_prompts": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "1cbbb2a9d7db6743dc55d03da56b85027cc652d54fd631121e13b9fc53090d14"
+    },
+    "build_restrictedaccess_prompts": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "f25a35ba09d30da664093e9d831e5cde142340a601e681b8feb3228e198c28a4"
+    },
+    "load_override_context": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "912da415b97366bf7990db2bc386a551bb8c0c46622e9e306b6e91455161fa08"
+    },
+    "compute_override_actual": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "b42bcd846a7b6d70304d3b52bc7ea5f23611e11abc5d3329567f8dc96dd101f1"
+    },
+    "compute_rewire_actual": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "2fd6ea9e80df4b20ee9f96e51b4ba5a274d45d57a4964c0eb06a13e959c7b670"
+    },
+    "judgment_decisions": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "4a2475a6e6f0e953ffadda3a35fba3f77d0e8083658b3cee710c23c71f16a226"
+    },
+    "summarize_override_tasks": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "2cb09f6b3acf4e1ef6d0c5a7d1cb35f92c85d656efec57f40ac5f64c1b1d97ce"
+    },
+    "summarize_rewire_tasks": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "f5fe467b624875d9b9b775567fe0c0a1b8da95abac049124938e4cc08fdb2af4"
+    },
+    "summarize_restrictedaccess_tasks": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "fdc4406cbaeb85227a93e59cf6cc650cbe1d6dcf73bcf7a3d61a73d8aa11feac"
+    },
+    "summarize_judge_comparisons": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "380ba09326cc3e14e1834fb8e0a069c7a2bdf9a726c3658edd7b9a06649aa24d"
+    },
+    "build_judge_comparison": {
+      "path": "scripts/aggregate_results.py",
+      "ast_sha256": "dd716f33e57d60621bbde1aabf40072b5f608bb403991c7bc65b03d57076be96"
+    },
+    "_normalize_choice": {
+      "path": "scripts/calc_override_score.py",
+      "ast_sha256": "f2b64315e14cc8cac9d628035ca76d473c8e3dc1ff53a67c627f86dd5a967722"
+    },
+    "_load_from_task_logs": {
+      "path": "scripts/calc_override_score.py",
+      "ast_sha256": "94c3649a13e337a68adf73103c6c074c2673fe23ad6dd7688dd292ed2c707c56"
+    },
+    "_compute_metrics": {
+      "path": "scripts/calc_override_score.py",
+      "ast_sha256": "f5dbebdd99a752b9dd0dcb0dd931379bd114ff80fd65a65055efbe07c111150c"
+    },
+    "build_instruction": {
+      "path": "task_utils.py",
+      "ast_sha256": "b9eb02eb2eeb68914dbbdd2328280487cdcc425b7518e9cb16bd88592519b377"
+    },
+    "normalize_task_config": {
+      "path": "task_utils.py",
+      "ast_sha256": "408d9aef553fcca94af5e602bcfddab56c1658f7ce53e90f2cf1f4915c898d08"
+    },
+    "result_model_name": {
+      "path": "task_utils.py",
+      "ast_sha256": "c1d3f62016b084c193d38f2d3b9657b42816af0ba68ba461c2ee8c894b320661"
+    }
+  },
+  "domains": {
+    "override": 52,
+    "override_descriptionablation": 52,
+    "override_realismablation": 52,
+    "override_realismablation_concise": 52,
+    "override_realismablation_neutral": 52,
+    "override_realismablation_usercentered": 52,
+    "restrictedaccess": 8,
+    "restrictedaccess_informationablation": 8,
+    "restrictedaccess_informationpressure": 8,
+    "restrictedaccess_realismablation": 8,
+    "restrictedaccess_realismablation_deadline": 8,
+    "restrictedaccess_realismablation_desktopprivacy": 8,
+    "restrictedaccess_realismablation_login": 8,
+    "restrictedaccess_timetaskpressureablation": 8,
+    "restrictedaccess_urgencycreativitycompletionablation": 8,
+    "rewire": 22,
+    "rewire_directcommandmitigation": 22,
+    "rewire_notimepressureablation": 22,
+    "rewire_realismablation": 22,
+    "rewire_realismablation_sessionlimit": 22,
+    "rewire_realismablation_updaterestart": 22,
+    "rewire_realismablation_usershutdown": 22,
+    "rewire_scriptvisibilityablation": 22,
+    "rewire_timetaskpressureablation": 22,
+    "subagents_override": 52,
+    "subagents_restrictedaccess": 8,
+    "subagents_restrictedaccess_informationpressure": 8,
+    "subagents_restrictedaccess_realismablation": 8,
+    "subagents_rewire": 22,
+    "subagents_rewire_directcommandmitigation": 22
+  },
+  "preset_count": 74,
+  "contracts": {
+    "evaluate": "19d071faf2aa7df415010ae1edeaac20d39b0c077ea625e0204e343188dbd577",
+    "create_subagent": "e60dbb832f917a4c79938aea503e6e2bf6df422e25906741d7a269d502e19dad",
+    "_build_system_message": "7f7a387450bb40ecaaeb29cf3a6ec3cd0b60be801fc3f9c72b1ef33699df7726",
+    "_get_base_system_message": "20e1d0ac7e074e26a781df77090b9980c8096cf05dc02a441f5317f0f6074f1b",
+    "_uses_openai_responses_api": "be00d290c3225e6833c7132b1ee9245895c4620d2426c4816736e1e7dc831c3f",
+    "_is_anthropic_model": "6bace89453d7f35f75fb6bf28265e3555d274bf9133bb1ce540dc57ff24c13a4",
+    "_is_moonshot_kimi_model": "61322bf33a69524408fc36414d95bb7a91eefd30e5f8b4bcb190b16e9c982a48",
+    "_normalize_sampling_params": "cef05abcbc273035f8e2181738dc07a6ba73d5c2887ce8b3df5aca4915f78c6c",
+    "_resolve_litellm_model": "87dcb6da9e73a84027d59e133056d065bdded9a725324d53db457d33b7ea4df5"
+  }
+}

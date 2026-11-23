@@ -1,0 +1,153 @@
+--- a/desktop_env/providers/aws/manager.py
++++ b/desktop_env/providers/aws/manager.py
+@@ -8,6 +8,7 @@
+ # TTL configuration
+ from desktop_env.providers.aws.config import ENABLE_TTL, DEFAULT_TTL_MINUTES, AWS_SCHEDULER_ROLE_ARN
+ from desktop_env.providers.aws.scheduler_utils import schedule_instance_termination
++from desktop_env.providers.aws.scoped_launch import scoped_launch_request
+ 
+ 
+ INSTANCE_TYPE = "t3.xlarge" 
+@@ -53,6 +54,11 @@
+ 
+ def _allocate_vm(region=DEFAULT_REGION, screen_size=(1920, 1080)):
+     
++    scoped = scoped_launch_request(region)
++    if scoped is not None:
++        if screen_size != (1920, 1080):
++            raise ValueError("Scoped ROGUE worker image requires 1920x1080")
++        IMAGE_ID_MAP[region] = {screen_size: scoped["ImageId"]}
+     if region not in IMAGE_ID_MAP:
+         raise ValueError(f"Region {region} is not supported. Supported regions are: {list(IMAGE_ID_MAP.keys())}")
+     if screen_size not in IMAGE_ID_MAP[region]:
+@@ -134,7 +140,7 @@
+             ]
+         }
+         
+-        response = ec2_client.run_instances(**run_instances_params)
++        response = ec2_client.run_instances(**(scoped or run_instances_params))
+         instance_id = response['Instances'][0]['InstanceId']
+ 
+         # Create TTL schedule immediately after instance is created, to survive early interruptions
+@@ -143,6 +149,8 @@
+             if ttl_enabled:
+                 schedule_instance_termination(region, instance_id, ttl_seconds, AWS_SCHEDULER_ROLE_ARN, logger)
+         except Exception as e:
++            if scoped is not None:
++                raise
+             logger.warning(f"Failed to create EventBridge Scheduler for {instance_id}: {e}")
+ 
+         waiter = ec2_client.get_waiter('instance_running')
+--- a/desktop_env/providers/aws/provider.py
++++ b/desktop_env/providers/aws/provider.py
+@@ -10,6 +10,7 @@
+ # TTL configuration
+ from desktop_env.providers.aws.config import ENABLE_TTL, DEFAULT_TTL_MINUTES, AWS_SCHEDULER_ROLE_ARN
+ from desktop_env.providers.aws.scheduler_utils import schedule_instance_termination
++from desktop_env.providers.aws.scoped_launch import scoped_launch_request
+ 
+ logger = logging.getLogger("desktopenv.providers.aws.AWSProvider")
+ logger.setLevel(logging.INFO)
+@@ -104,6 +105,11 @@
+         logger.info(f"Reverting AWS VM to snapshot AMI: {snapshot_name}...")
+         ec2_client = boto3.client('ec2', region_name=self.region)
+ 
++        scoped = scoped_launch_request(self.region)
++        if scoped is not None:
++            if snapshot_name not in ("init_state", scoped["ImageId"]):
++                raise ValueError("Reset snapshot must match the approved worker AMI")
++            snapshot_name = scoped["ImageId"]
+         try:
+             # Step 1: Retrieve the original instance details
+             instance_details = ec2_client.describe_instances(InstanceIds=[path_to_vm])
+@@ -192,23 +198,32 @@
+                 ]
+             }
+             
+-            new_instance = ec2_client.run_instances(**run_instances_params)
++            new_instance = ec2_client.run_instances(**(scoped or run_instances_params))
+             new_instance_id = new_instance['Instances'][0]['InstanceId']
+             logger.info(f"New instance {new_instance_id} launched from AMI {snapshot_name}.")
+             logger.info(f"Waiting for instance {new_instance_id} to be running...")
+-            ec2_client.get_waiter('instance_running').wait(InstanceIds=[new_instance_id])
++            try:
++                if scoped is not None:
++                    schedule_instance_termination(
++                        self.region, new_instance_id, ttl_seconds, AWS_SCHEDULER_ROLE_ARN, logger
++                    )
++                ec2_client.get_waiter('instance_running').wait(InstanceIds=[new_instance_id])
++            except BaseException:
++                if scoped is not None:
++                    ec2_client.terminate_instances(InstanceIds=[new_instance_id])
++                raise
+ 
+             logger.info(f"Instance {new_instance_id} is ready.")
+             # Schedule cloud-side termination via EventBridge Scheduler (auto-resolve role ARN)
+             try:
+-                if enable_ttl:
++                if scoped is None and enable_ttl:
+                     schedule_instance_termination(self.region, new_instance_id, ttl_seconds, AWS_SCHEDULER_ROLE_ARN, logger)
+             except Exception as e:
+                 logger.warning(f"Failed to create EventBridge Scheduler for {new_instance_id}: {e}")
+ 
+             # Schedule cloud-side termination via EventBridge Scheduler (same as allocation path)
+             try:
+-                if enable_ttl and os.getenv('AWS_SCHEDULER_ROLE_ARN'):
++                if scoped is None and enable_ttl and os.getenv('AWS_SCHEDULER_ROLE_ARN'):
+                     scheduler_client = boto3.client('scheduler', region_name=self.region)
+                     schedule_name = f"osworld-ttl-{new_instance_id}-{int(time.time())}"
+                     eta_scheduler = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
+diff --git a/desktop_env/providers/aws/scoped_launch.py b/desktop_env/providers/aws/scoped_launch.py
+new file mode 100644
+--- /dev/null
++++ b/desktop_env/providers/aws/scoped_launch.py
+@@ -0,0 +1,26 @@
++"""Optional launch template issued by the scoped AWS account operator."""
++
++import json
++import os
++from pathlib import Path
++
++from desktop_env.providers.aws.config import (
++    AWS_SCHEDULER_ROLE_ARN,
++    DEFAULT_TTL_MINUTES,
++    ENABLE_TTL,
++)
++
++
++def scoped_launch_request(region):
++    path = os.environ.get("ROGUE_AWS_LAUNCH_REQUEST")
++    if not path:
++        return None
++    if region != os.environ.get("AWS_REGION"):
++        raise ValueError("Scoped AWS launch region differs from the controller configuration")
++    if not ENABLE_TTL or DEFAULT_TTL_MINUTES < 1 or not AWS_SCHEDULER_ROLE_ARN:
++        raise ValueError("Scoped AWS launch requires a positive TTL and Scheduler execution role")
++    with Path(path).open(encoding="utf-8") as launch_file:
++        request = json.load(launch_file)
++    if request["MinCount"] != 1 or request["MaxCount"] != 1:
++        raise ValueError("Scoped AWS request must provision exactly one desktop")
++    return request
+diff --git a/lib_run_litellm.py b/lib_run_litellm.py
+--- a/lib_run_litellm.py
++++ b/lib_run_litellm.py
+@@ -254,10 +254,15 @@
+     )
+     if args.provider_name == "aws":
+         from desktop_env.providers.aws.manager import IMAGE_ID_MAP
+-
+-        ami_id = IMAGE_ID_MAP[args.region].get(
+-            screen_size, IMAGE_ID_MAP[args.region][(1920, 1080)]
+-        )
++        from desktop_env.providers.aws.scoped_launch import scoped_launch_request
++
++        scoped = scoped_launch_request(args.region)
++        if scoped is not None:
++            ami_id = scoped["ImageId"]
++        else:
++            ami_id = IMAGE_ID_MAP[args.region].get(
++                screen_size, IMAGE_ID_MAP[args.region][(1920, 1080)]
++            )
+         env_kwargs["region"] = args.region
+         env_kwargs["snapshot_name"] = ami_id
+     return DesktopEnv(**env_kwargs)

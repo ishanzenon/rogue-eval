@@ -1,0 +1,10 @@
+title: "rogue-eval"
+description: |
+  ROGUE corrigibility evaluation using the original OSWorld desktop harness
+group: Safeguards
+contributors:
+  - ishanzenon
+version: "2-A"
+tasks:
+  - name: rogue_eval
+    dataset_samples: 82
